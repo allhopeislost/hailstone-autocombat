@@ -874,8 +874,8 @@ local function targetingPage(s)
   local text, changed = ui.InputTextMultiline("##acignore", table.concat(t.ignore, "\n"), 4096, -1, 80 * s)
   if changed and P then
     local list = {}
-    for line in (text .. "\n"):gmatch("([^\n]*)\n") do
-      line = line:gsub("^%s+", ""):gsub("%s+$", "")
+    for raw in (text .. "\n"):gmatch("([^\n]*)\n") do
+      local line = raw:gsub("^%s+", ""):gsub("%s+$", "")
       if line ~= "" then list[#list + 1] = line end
     end
     P.set_ignore(list)
