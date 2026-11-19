@@ -223,10 +223,10 @@ MIT (see `LICENSE`).
 ## Development
 
 The pure parts (settings, conditions, row choice, targeting and the mode logic), and the world snapshot with mock
-client APIs, are tested with plain Lua 5.4:
+client APIs, are tested with plain Lua 5.5 (5.4 works too):
 
 ```sh
-lua5.4 tests/run.lua
+lua5.5 tests/run.lua
 ```
 
 `autocombat/init.lua` and live client integration are not covered by these tests. Try them in the client.
