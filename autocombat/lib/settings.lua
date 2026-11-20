@@ -49,6 +49,7 @@ function M.defaults()
       camp = nil,                 -- camp style: {x, y, z (the server's coordinates), zone (short name)}
       leash = 400,                -- camp: how far from the camp it goes for a mob
       max_path = 800,             -- the longest walk to a mob
+      wide_search = true,         -- roam: with nothing in the search radius, look in the whole zone
       pull_kind = "",             -- camp: the pull (a spell or ability; "" walks up and attacks)
       pull_name = "",
       max_haters = 2,             -- do not go looking while this many are on you

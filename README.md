@@ -11,6 +11,11 @@ behind its gear button. It fights for you in one of three modes:
 | **Hunter** | Press Start. | Everything Full does. When nothing is on you, it rests, finds a mob and walks to it over the navigation mesh, until you pause it. It can roam the zone (nearby mobs first, then anywhere it can walk to) or pull mobs back to a camp. |
 | **Assist** | Group up, or pick who to assist. | Everything Full does, but it only fights what your assist is fighting, once that mob's health is low enough. Between fights it follows the assist. |
 
+Hunter looks within its search radius first, nearest mob first. With nothing in the radius it searches the whole
+zone, nearest first, and walks as far as the mob is, ignoring Longest walk; Longest walk applies to the radius search
+(and to camp). To keep Hunter to the radius only, untick **When nothing is in range, search the whole zone** on the
+Hunter page.
+
 ## The windows
 
 The compact window opens when the script starts. It has the mode (and Manual's Full or Partial), a Start / Pause
@@ -167,9 +172,10 @@ Settings are kept per server and character in `scripts/config/autocombat/`.
 | `/autocombat camp` | set Hunter's camp where you stand |
 | `/autocombat status` | what it is doing |
 
-When Hunter finds nothing, the status line says why: no NPCs, every NPC left out by the Targeting page, or the
-zone's navigation mesh still being built (it waits for it), no path to the nearest mobs, or the nearest mobs past the
-longest walk. The Log page has the counts behind it (NPCs in the zone, left out, candidates, no path, too far).
+When Hunter finds nothing, the status line says why: no NPCs, every NPC left out by the Targeting page, no mobs
+within range (the whole-zone search is off; in a camp, that means past the leash), or the zone's navigation mesh still
+being built (it waits for it), no path to the nearest mobs, or the nearest mobs past the longest walk. The Log page has
+the counts behind it (NPCs in the zone, left out, candidates, no path, too far).
 
 Full and Hunter fight only the mobs on your extended target list (the ones fighting you) and the mob Hunter chose to
 go after: never whatever you happen to have targeted with auto attack on. No mode picks someone's pet, a swarm pet

@@ -83,16 +83,21 @@ local function flat(a, b)
 end
 
 -- Hunter: the mobs worth walking to, best first. `from` is where it looks from (me, or the camp), `skip` the ids
--- given up on. `whole_zone` drops the search radius (roam, when nothing is near). The second result counts the mobs
--- the targeting settings left out, for the status line.
+-- given up on. `whole_zone` drops the search radius (roam, when nothing is near). The second result counts, for the
+-- status line, the mobs the targeting filters left out (filtered), the ones in `skip` (skipped), and the ones only the
+-- reach and height test left out (outside).
 function M.hunt_candidates(spawns, t, h, from, skip, camp_style, whole_zone, zone)
-  local out, filtered = {}, 0
+  local out = {}
+  local counts = { filtered = 0, outside = 0, skipped = 0 }
   for _, s in ipairs(spawns) do
     local is_white = whitelist.contains(t.whitelist, zone, s.name) and not s.owned
     local wanted = s.npc and not s.dead and M.allowed(s, t, zone)
       and (is_white or not (t.skip_near_players and s.players_near))
-    if not wanted then filtered = filtered + 1 end
-    if wanted and not skip[s.id] then
+    if not wanted then
+      counts.filtered = counts.filtered + 1
+    elseif skip[s.id] then
+      counts.skipped = counts.skipped + 1
+    else
       local d = flat({ s.x, s.y }, from)
       local dz = math.abs((s.z or 0) - (from[3] or 0))
       local reach = camp_style and h.leash or t.radius
@@ -100,6 +105,9 @@ function M.hunt_candidates(spawns, t, h, from, skip, camp_style, whole_zone, zon
         s.from_distance = d
         s.whitelisted = is_white
         out[#out + 1] = s
+      else
+        -- Feeds "No mobs within range" when the whole-zone search is off.
+        counts.outside = counts.outside + 1
       end
     end
   end
@@ -109,7 +117,7 @@ function M.hunt_candidates(spawns, t, h, from, skip, camp_style, whole_zone, zon
     if a.from_distance ~= b.from_distance then return a.from_distance < b.from_distance end
     return a.id < b.id
   end)
-  return out, filtered
+  return out, counts
 end
 
 return M

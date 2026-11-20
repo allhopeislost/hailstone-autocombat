@@ -150,6 +150,13 @@ case("engine: hunter roaming looks past the search radius when nothing is near",
   local w2 = fake.world({ hunt = { far }, spawns = { far }, paths = { [50] = 3500 } })
   engine.tick(e2, w2, s2, io2)
   eq(e2.hunt, nil, "camp: not past the leash")
+  -- With the whole-zone search off it stays within the radius and says so.
+  local s3, e3, io3 = setup({ mode = "hunter", hunter = { wide_search = false } })
+  local w3 = fake.world({ hunt = { far }, spawns = { far }, paths = { [50] = 3500 } })
+  engine.tick(e3, w3, s3, io3)
+  eq(e3.hunt, nil, "wide search off: stays in the radius")
+  eq(e3.status, "No mobs within range", "status")
+  check(not io3.has("/nav id 50 distance=10"), "no walk to the far mob")
 end)
 
 case("engine: hunter waits for the mesh instead of skipping mobs for long, and says why it finds none", function()

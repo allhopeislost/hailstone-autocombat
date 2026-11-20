@@ -67,6 +67,13 @@ case("settings: set by path changes plain values only", function()
   eq(s.rest.stand_hp, 100, "clamped through repair")
 end)
 
+case("settings: the Hunter whole-zone search is on by default and can be turned off", function()
+  eq(settings.repair({ hunter = { style = "roam" } }).hunter.wide_search, true, "on without the saved key")
+  eq(settings.repair({ hunter = { wide_search = false } }).hunter.wide_search, false, "saved off stays off")
+  local s, ok = settings.set(settings.repair(nil), "hunter.wide_search", false)
+  check(ok and s.hunter.wide_search == false, "set by path")
+end)
+
 case("settings: Import spell bar makes a row from what each spell is", function()
   local nuke = settings.row_for_spell({ name = "Flame Lick", beneficial = false, target_type = "Single", duration = 0 })
   eq(nuke.target, "enemy", "nuke on the fight target")

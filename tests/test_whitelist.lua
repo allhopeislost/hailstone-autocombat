@@ -89,6 +89,16 @@ case('whitelist: takes candidate priority even over the closer usual targets', f
   eq(list[2].id, 1, 'normal candidate second')
 end)
 
+case('whitelist: still chosen outside the radius with the whole-zone search off', function()
+  local s = settings.repair({ mode = 'hunter', hunter = { wide_search = false },
+    targeting = { whitelist = { testzone = { 'Named Target' } } } })
+  local chosen = fake.spawn({ id = 2, name = 'Named_Target003', x = 1500, y = 0, distance = 1500 })
+  local e, io = engine.new(), fake.io()
+  engine.start(e, io)
+  engine.tick(e, fake.world({ hunt = { chosen }, spawns = { chosen }, paths = { [2] = 1600 } }), s, io)
+  eq(e.hunt and e.hunt.id, 2, 'whitelisted beyond the radius')
+end)
+
 case('whitelist: all faction standings off still hunts only whitelisted mobs, without /consider', function()
   local s = settings.repair({ mode = 'hunter', targeting = {
     mob_cons = { Scowling = false, Threateningly = false, Dubious = false, Apprehensive = false,

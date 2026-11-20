@@ -951,7 +951,12 @@ local function hunterPage(s)
     local r = number("##acrad", t.radius, 80 * s, 10, 5000)
     if r then set("targeting.radius", r) end
     ui.SameLine()
-    ui.TextColored(C.faint[1], C.faint[2], C.faint[3], 1, "nearer mobs first; with none there, anywhere in the zone")
+    ui.TextColored(C.faint[1], C.faint[2], C.faint[3], 1, "nearer mobs first")
+    field("When nothing is in range", s)
+    local wide = check("##acwide", h.wide_search)
+    if wide ~= nil then set("hunter.wide_search", wide) end
+    ui.SameLine()
+    ui.TextColored(C.faint[1], C.faint[2], C.faint[3], 1, "search the whole zone")
   end
   section("Limits", s)
   field("Height range", s)

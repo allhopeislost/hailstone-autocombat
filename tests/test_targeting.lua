@@ -25,7 +25,7 @@ case("targeting: the hunter's filters", function()
   t.named = false
   check(not targeting.allowed(fake.spawn({ id = 1, level = 10, named = true }), t), "named off")
   local h = settings.defaults().hunter
-  local list = targeting.hunt_candidates({
+  local list, counts = targeting.hunt_candidates({
     fake.spawn({ id = 1, level = 10, x = 100, y = 0 }),
     fake.spawn({ id = 2, level = 10, x = 50, y = 0 }),
     fake.spawn({ id = 3, level = 10, x = 10, y = 0, players_near = true }),
@@ -36,6 +36,18 @@ case("targeting: the hunter's filters", function()
   eq(#list, 2, "near players, far, high and skipped left out")
   eq(list[1].id, 2, "closest first")
   eq(list[2].id, 1, "then the next")
+  eq(counts.filtered, 1, "the mob with players near is filtered out")
+  eq(counts.outside, 2, "the far and the high mob are outside the search radius")
+  eq(counts.skipped, 1, "the skipped mob")
+end)
+
+case("targeting: a skipped mob past the reach counts as skipped, not outside", function()
+  local s = settings.defaults()
+  local far = fake.spawn({ id = 7, x = 5000, y = 0 })
+  local list, counts = targeting.hunt_candidates({ far }, s.targeting, s.hunter, { 0, 0, 0 }, { [7] = 1 }, false)
+  eq(#list, 0, "not a candidate")
+  eq(counts.skipped, 1, "skipped")
+  eq(counts.outside, 0, "not also counted as outside the reach")
 end)
 
 case("targeting: someone's pet (a swarm pet too) is never chosen", function()

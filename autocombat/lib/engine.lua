@@ -534,11 +534,12 @@ local function hunt(e, world, s, io)
   end
   local from = camp or { me.x, me.y, me.z }
   local all = world.hunt_spawns()
-  local list, filtered = targeting.hunt_candidates(all, s.targeting, h, from, e.skip, camp ~= nil, false, world.zone)
-  -- Roam: nothing within the search radius, so anywhere in the zone, nearest first, however long the walk.
+  local list, counts = targeting.hunt_candidates(all, s.targeting, h, from, e.skip, camp ~= nil, false, world.zone)
+  -- Roam: nothing within the search radius, so anywhere in the zone, nearest first, however long the walk (unless the
+  -- player turned the whole-zone search off).
   local wide = false
-  if #list == 0 and not camp then
-    list = targeting.hunt_candidates(all, s.targeting, h, from, e.skip, false, true, world.zone)
+  if #list == 0 and not camp and h.wide_search then
+    list, counts = targeting.hunt_candidates(all, s.targeting, h, from, e.skip, false, true, world.zone)
     wide = true
   end
   local mesh = world.mesh or { loaded = true, complete = true }
@@ -566,8 +567,10 @@ local function hunt(e, world, s, io)
     why = "No navigation mesh for this zone yet"
   elseif no_path > 0 and not mesh.complete then
     why = string.format("Waiting for the navigation mesh (%d/%d)", mesh.built or 0, mesh.total or 0)
-  elseif #list == 0 and filtered == #all then
+  elseif #list == 0 and counts.filtered == #all then
     why = string.format("No mobs to hunt: the Targeting page leaves out all %d NPCs", #all)
+  elseif #list == 0 and not wide and counts.outside > 0 and counts.skipped == 0 then
+    why = "No mobs within range"
   elseif #list == 0 then
     why = "No mobs to hunt (the ones left are skipped for now)"
   elseif no_path > 0 then
@@ -578,7 +581,7 @@ local function hunt(e, world, s, io)
   e.status = why
   -- The log gets the counts once per change of reason, so a hunt that finds nothing can be told apart.
   if why ~= e.look_why then
-    note(e, string.format("%s (NPCs %d, left out %d, candidates %d%s, no path %d, too far %d)", why, #all, filtered,
+    note(e, string.format("%s (NPCs %d, left out %d, candidates %d%s, no path %d, too far %d)", why, #all, counts.filtered,
       #list, wide and " zone-wide" or "", no_path, too_long), io)
   end
   e.look_why = why
